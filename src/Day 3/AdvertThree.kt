@@ -17,7 +17,7 @@ fun numSquaresWithOverlap(fabrics: List<Fabric>): Int {
         seenFabrics.forEach { squaresWithOverlappingFabric.addAll(squaresThatOverlap(it, f)) }
         seenFabrics.add(f)
     }
-    return squaresWithOverlappingFabric.distinct().size
+    return squaresWithOverlappingFabric.size
 }
 
 fun squaresThatOverlap(f1: Fabric, f2: Fabric): Set<Pair<Int, Int>> {
