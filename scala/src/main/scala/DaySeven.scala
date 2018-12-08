@@ -3,15 +3,7 @@ import scala.io.Source
 object DaySeven {
 
   def main(args: Array[String]): Unit = {
-    val preReqs = Source.fromFile("./src/main/scala/day_seven_input").getLines.map(lineToPreReq)
-    val stepsWithPreReq = preReqs.foldLeft(Map[Char, List[Char]]()) {
-      (map, preReq) =>
-        if (map.contains(preReq.subject))
-          map + (preReq.subject -> (map(preReq.subject) :+ preReq.req))
-        else
-          map + (preReq.subject -> List[Char](preReq.req))
-    }
-    val allSteps = stepsWithNoPreReqs(stepsWithPreReq).foldLeft(stepsWithPreReq){ (map, c) => map + (c -> List[Char]())}
+    val allSteps = extractSteps("./src/main/scala/day_seven_input")
 
     println(orderedSteps(allSteps)) // Part 1 = GLMVWXZDKOUCEJRHFAPITSBQNY
   }
@@ -27,17 +19,29 @@ object DaySeven {
     (steps - step).map(f => f._1 -> f._2.filterNot(c => c == step))
   }
 
-  def stepsWithNoPreReqs(stepsWithPreReq: Map[Char, List[Char]]): Iterable[Char] = {
-    val allSteps = (stepsWithPreReq.values.flatten.toList ++ stepsWithPreReq.keys.toList).distinct
-    allSteps.filterNot(stepsWithPreReq.keys.toList.contains)
+  def firstStep(steps: Map[Char, List[Char]]): Char = {
+    possibleSteps(steps).min
   }
 
   def possibleSteps(steps: Map[Char, List[Char]]): Iterable[Char] = {
     steps.keys.toList.distinct.filter(c => steps(c).isEmpty)
   }
 
-  def firstStep(steps: Map[Char, List[Char]]): Char = {
-    possibleSteps(steps).min
+  def extractSteps(filePath: String): Map[Char, List[Char]] = {
+    val preReqs = Source.fromFile(filePath).getLines.map(lineToPreReq)
+    val stepsWithPreReq = preReqs.foldLeft(Map[Char, List[Char]]()) {
+      (map, preReq) =>
+        if (map.contains(preReq.subject))
+          map + (preReq.subject -> (map(preReq.subject) :+ preReq.req))
+        else
+          map + (preReq.subject -> List[Char](preReq.req))
+    }
+    stepsWithNoPreReqs(stepsWithPreReq).foldLeft(stepsWithPreReq) { (map, c) => map + (c -> List[Char]()) }
+  }
+
+  def stepsWithNoPreReqs(stepsWithPreReq: Map[Char, List[Char]]): Iterable[Char] = {
+    val allSteps = (stepsWithPreReq.values.flatten.toList ++ stepsWithPreReq.keys.toList).distinct
+    allSteps.filterNot(stepsWithPreReq.keys.toList.contains)
   }
 
   def lineToPreReq(l: String): PreReq = {
