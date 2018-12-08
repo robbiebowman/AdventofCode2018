@@ -13,7 +13,7 @@ object DaySeven {
     }
     val allSteps = stepsWithNoPreReqs(stepsWithPreReq).foldLeft(stepsWithPreReq){ (map, c) => map + (c -> List[Char]())}
 
-    println(orderedSteps(allSteps)) // Part 1 = GLMVWXZDKOUCEJRHFAPITSBQNYGLMVWXZDKOUCEJRHFAPITSBQNY
+    println(orderedSteps(allSteps)) // Part 1 = GLMVWXZDKOUCEJRHFAPITSBQNY
   }
 
   def orderedSteps(stepsLeft: Map[Char, List[Char]]): String = {
@@ -33,7 +33,7 @@ object DaySeven {
   }
 
   def possibleSteps(steps: Map[Char, List[Char]]): Iterable[Char] = {
-    (steps.values.flatten ++ steps.keys).toList.distinct.filter(c => steps(c).isEmpty)
+    steps.keys.toList.distinct.filter(c => steps(c).isEmpty)
   }
 
   def firstStep(steps: Map[Char, List[Char]]): Char = {
