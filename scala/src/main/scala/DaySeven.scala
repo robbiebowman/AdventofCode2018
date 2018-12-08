@@ -2,6 +2,7 @@ import scala.io.Source
 
 object DaySeven {
 
+  // Puzzle constants
   val singleTaskTime = 60
   val workerCount = 5
 
@@ -11,7 +12,7 @@ object DaySeven {
     println(orderedSteps(allSteps).map(p => p._1).mkString("")) // Part 1 = GLMVWXZDKOUCEJRHFAPITSBQNY
 
     val rota = Map[Char, Int]()
-    println(totalTaskTime(allSteps, rota))
+    println(totalTaskTime(allSteps, rota)) // Part 2 = 1105
   }
 
   def totalTaskTime(stepsLeft: Map[Char, List[Char]], rota: Map[Char, Int]): Int = {
@@ -19,15 +20,20 @@ object DaySeven {
       0
     } else {
       val workableSteps = possibleSteps(stepsLeft withInProgress rota)
-      if (workableSteps.isEmpty || !rota.hasAvailableWorkers) { //wait for next completion
-        val nearestCompletion = rota.minBy(_._2)
-        val newRota = (rota withCompleted nearestCompletion).filter(p => p._2 <= 0)
-        rota(nearestCompletion._1) + totalTaskTime(
-          stepsLeft withCompleted nearestCompletion._1,
+
+      if (workableSteps.isEmpty || !rota.hasAvailableWorkers) { // Wait for next completion
+        val soonest = rota.minBy(_._2)
+        val newRota = rota withCompleted soonest
+        rota(soonest._1) + totalTaskTime(
+          stepsLeft withCompleted soonest._1,
           newRota
         )
-      } else { //assign new worker
-        totalTaskTime(stepsLeft, rota + (workableSteps.keys.min -> singleTaskTime))
+      } else { // Assign new worker
+        val nextStep = workableSteps.keys.min
+        totalTaskTime(
+          stepsLeft,
+          rota + (nextStep -> (singleTaskTime + (nextStep.toInt - 64)))
+        )
       }
     }
   }
@@ -45,6 +51,27 @@ object DaySeven {
 
   def possibleSteps(steps: Map[Char, List[Char]]): Map[Char, List[Char]] = {
     steps.filter(s => s._2.isEmpty)
+  }
+
+  implicit class StepMap(steps: Map[Char, List[Char]]) {
+    def withCompleted(step: Char): Map[Char, List[Char]] = {
+      (steps - step).map(f => f._1 -> f._2.filterNot(c => c == step))
+    }
+
+    def withInProgress(rota: Map[Char, Int]): Map[Char, List[Char]] = {
+      steps.filterKeys(k => !rota.keys.exists(_ == k))
+    }
+  }
+
+  implicit class RotaMap(rota: Map[Char, Int]) {
+    def hasAvailableWorkers: Boolean = {
+      rota.keys.size < workerCount
+    }
+
+    def withCompleted(assignment: (Char, Int)): Map[Char, Int] = {
+      val taskTime = rota(assignment._1)
+      rota.map(e => e._1 -> (e._2 - taskTime)).filter(p => p._2 > 0)
+    }
   }
 
   def readSteps(filePath: String): Map[Char, List[Char]] = {
@@ -68,27 +95,6 @@ object DaySeven {
     val stepDef = "Step (\\w) must be finished before step (\\w) can begin." r
     val matches = stepDef findAllIn l
     PreReq(matches.group(2).charAt(0), matches.group(1).charAt(0))
-  }
-
-  implicit class StepMap(steps: Map[Char, List[Char]]) {
-    def withCompleted(step: Char): Map[Char, List[Char]] = {
-      (steps - step).map(f => f._1 -> f._2.filterNot(c => c == step))
-    }
-
-    def withInProgress(rota: Map[Char, Int]): Map[Char, List[Char]] = {
-      steps.filterKeys(k => !rota.keys.exists(_ == k))
-    }
-  }
-
-  implicit class RotaMap(rota: Map[Char, Int]) {
-    def hasAvailableWorkers: Boolean = {
-      rota.keys.size < workerCount
-    }
-
-    def withCompleted(assignment: (Char, Int)): Map[Char, Int] = {
-      val taskTime = rota(assignment._1)
-      rota.filterKeys(_ != assignment._1).map(e => e._1 -> (e._2 - taskTime))
-    }
   }
 
 }
