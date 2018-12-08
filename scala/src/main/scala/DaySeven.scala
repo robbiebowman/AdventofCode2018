@@ -19,7 +19,6 @@ object DaySeven {
   def orderedSteps(stepsLeft: Map[Char, List[Char]]): String = {
     if (stepsLeft.keys.nonEmpty) {
       val first = firstStep(stepsLeft)
-      print(first)
       first + orderedSteps(completeStep(first, stepsLeft))
     } else ""
   }
