@@ -4,6 +4,9 @@ import scala.io.Source
 
 object DayEight {
 
+  // Puzzle constants
+  val headerLen = 2
+
   case class Node(children: Array[Node], metadata: Array[Int]) {
     def metadataSum: Int = {
       children.map(_.metadataSum).sum + metadata.sum
@@ -25,19 +28,17 @@ object DayEight {
     val numChildren = numbers(0)
     val numMetadata = numbers(1)
     if (numChildren == 0) {
-      val metadataEnd = numMetadata + 2
-      Node(Array(), numbers.slice(2, metadataEnd))
+      val metadataEnd = numMetadata + headerLen
+      Node(Array(), numbers.slice(headerLen, metadataEnd))
     } else {
-      val children = getSiblings(numbers.drop(2), numChildren-1)
-      val childrenDefLength = children.map(_.definitionLength).sum
-      Node(children, numbers.slice(2 + childrenDefLength, 2 + childrenDefLength + numMetadata))
+      val children = getSiblings(numbers.drop(headerLen), numChildren - 1)
+      val childrenDefLen = children.map(_.definitionLength).sum
+      Node(children, numbers.slice(headerLen + childrenDefLen, headerLen + childrenDefLen + numMetadata))
     }
   }
 
   def getSiblings(numbers: Array[Int], numSiblings: Int): Array[Node] = {
-    if (numbers.isEmpty) {
-      Array()
-    } else if (numSiblings == 0) {
+    if (numSiblings == 0) {
       Array(getNode(numbers))
     } else {
       val node = getNode(numbers)
