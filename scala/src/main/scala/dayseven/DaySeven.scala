@@ -1,4 +1,4 @@
-package daySeven
+package dayseven
 
 import scala.io.Source
 
@@ -9,7 +9,7 @@ object DaySeven {
   val workerCount = 5
 
   def main(args: Array[String]): Unit = {
-    val allSteps = readSteps("./src/main/scala/daySeven/day_seven_input")
+    val allSteps = readSteps("./src/main/scala/dayseven/day_seven_input")
 
     println(orderedSteps(allSteps).map(p => p._1).mkString("")) // Part 1 = GLMVWXZDKOUCEJRHFAPITSBQNY
 
