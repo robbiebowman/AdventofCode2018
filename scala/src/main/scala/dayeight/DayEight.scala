@@ -12,6 +12,13 @@ object DayEight {
       children.map(_.metadataSum).sum + metadata.sum
     }
 
+    def metadataIndexSum: Int = {
+      if (children.isEmpty) metadata.sum
+      else {
+        metadata.map(i => if (children.length >= i) children(i - 1).metadataIndexSum else 0).sum
+      }
+    }
+
     def definitionLength: Int = {
       2 + children.map(_.definitionLength).sum + metadata.length
     }
@@ -21,7 +28,9 @@ object DayEight {
     val numbers = Source.fromFile("./src/main/scala/dayeight/day_eight_input").getLines.next().split(' ').map(_.toInt)
 
     val root = getNode(numbers)
-    println(root.metadataSum)
+    println(root.metadataSum) // Part 1 = 42798
+
+    println(root.metadataIndexSum) // Part 2 = 23798
   }
 
   def getNode(numbers: Array[Int]): Node = {
