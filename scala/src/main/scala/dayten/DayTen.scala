@@ -11,16 +11,21 @@ object DayTen {
     val coordinates = info.map(_._1)
     val vectors = info.map(_._2)
 
-    val smallestSquare = lowestEntropyCoordinate(coordinates, vectors, Long.MaxValue)
-    drawStars(smallestSquare)
+    val smallestSquare = smallestGridCoordinates(coordinates, vectors, Long.MaxValue, 0)
+
+    drawStars(smallestSquare._1) // Part 1 = LCPGPXGL
+    println(smallestSquare._2) // Part 2 = 10639
   }
 
-  def lowestEntropyCoordinate(coordinates: Array[(Int, Int)],
+  def smallestGridCoordinates(coordinates: Array[(Int, Int)],
                               vectors: Array[(Int, Int)],
-                              entropy: Long): Array[(Int, Int),] = {
+                              grid: Long,
+                              iteration: Int // Only used for part 2 puzzle
+                             ): (Array[(Int, Int)], Int) = {
     val newCoordinates = applyVector(coordinates, vectors)
-    val newEntropy = crudeEntropy(newCoordinates)
-    if (newEntropy > entropy) coordinates else lowestEntropyCoordinate(newCoordinates, vectors, newEntropy)
+    val newGrid = enclosingGrid(newCoordinates)
+    if (newGrid > grid) (coordinates, iteration)
+    else smallestGridCoordinates(newCoordinates, vectors, newGrid, iteration + 1)
   }
 
   def applyVector(coordinates: Array[(Int, Int)], vectors: Array[(Int, Int)]): Array[(Int, Int)] = {
@@ -29,24 +34,17 @@ object DayTen {
 
   def drawStars(coordinates: Array[(Int, Int)]): Unit = {
     val lineSep = System.getProperty("line.separator")
-    val pw = new PrintWriter(new File("./src/main/scala/dayten/day_ten_output.txt" ))
+    val pw = new PrintWriter(new File("./src/main/scala/dayten/day_ten_output.txt"))
     val (minX, minY, maxX, maxY) = extremities(coordinates)
-    (minX to maxX).foreach(x => {
-      pw.write((minY to maxY).map(y => if (coordinates.contains((x, y))) '#' else ' ').mkString + lineSep)
-      println(s"printed line $x, $minX $maxX")
-    })
+    (minX to maxX).foreach(x => pw.write((minY to maxY).map(y => if (coordinates.contains((x, y))) '#' else ' ').mkString + lineSep))
     pw.close()
   }
 
-  def crudeEntropy(coordinates: Array[(Int, Int)]): Long = {
+  def enclosingGrid(coordinates: Array[(Int, Int)]): Long = {
     val (minX, minY, maxX, maxY) = extremities(coordinates)
     val xlen = math.abs(maxX - minX)
     val ylen = math.abs(maxY - minY)
-    xlen.toLong * ylen.toLong
-  }
-
-  def isAdjacent(p1: (Int, Int), p2: (Int, Int)): Boolean = {
-    math.abs(p1._1 - p2._1) <= 1 && math.abs(p1._2 - p2._2) <= 1
+    xlen.toLong * ylen.toLong // Prevents Int overflow
   }
 
   def extremities(coordinates: Array[(Int, Int)]): (Int, Int, Int, Int) = {
