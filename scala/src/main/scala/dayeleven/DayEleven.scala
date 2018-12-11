@@ -9,11 +9,11 @@ object DayEleven {
   def main(args: Array[String]): Unit = {
     val grid = squareGrid(300)
 
-    val highestPowerSquare = (0 until 297).flatMap(x => (0 until 297)
-      .map(y => (x, y)))
-      .maxBy(p => squareTotalPower(p._1, p._2, 3, grid))
+    val highestPowerSquare = (1 to 300).flatMap(size => (0 until 300 - size)
+      .map(x => (size, x))).flatMap(p => (0 until 300 - p._1).map(y => (p._1, p._2, y)))
+      .maxBy(p => squareTotalPower(p._2, p._3, p._1, grid))
 
-    println(s"${highestPowerSquare._1 + 1},${highestPowerSquare._2 + 1}") // Part 1 = 243,34
+    println(s"Biggest: ${highestPowerSquare._2 + 1},${highestPowerSquare._3 + 1},${highestPowerSquare._1}") // Part 1 = 243,34
   }
 
   def squareTotalPower(x: Int, y: Int, size: Int, grid: Array[Array[Int]]): Int = {
