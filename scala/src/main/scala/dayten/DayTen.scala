@@ -11,21 +11,21 @@ object DayTen {
     val coordinates = info.map(_._1)
     val vectors = info.map(_._2)
 
-    val smallestSquare = smallestGridCoordinates(coordinates, vectors, Long.MaxValue, 0)
+    val smallestGridInfo = smallestGrid(coordinates, vectors, gridArea = Long.MaxValue, iteration = 0)
 
-    drawStars(smallestSquare._1) // Part 1 = LCPGPXGL
-    println(smallestSquare._2) // Part 2 = 10639
+    drawStars(smallestGridInfo._1) // Part 1 = LCPGPXGL
+    println(smallestGridInfo._2) // Part 2 = 10639
   }
 
-  def smallestGridCoordinates(coordinates: Array[(Int, Int)],
-                              vectors: Array[(Int, Int)],
-                              grid: Long,
-                              iteration: Int // Only used for part 2 puzzle
+  def smallestGrid(coordinates: Array[(Int, Int)],
+                   vectors: Array[(Int, Int)],
+                   gridArea: Long,
+                   iteration: Int // Only used for part 2 puzzle
                              ): (Array[(Int, Int)], Int) = {
     val newCoordinates = applyVector(coordinates, vectors)
-    val newGrid = enclosingGrid(newCoordinates)
-    if (newGrid > grid) (coordinates, iteration)
-    else smallestGridCoordinates(newCoordinates, vectors, newGrid, iteration + 1)
+    val newGridArea = enclosingGrid(newCoordinates)
+    if (newGridArea > gridArea) (coordinates, iteration)
+    else smallestGrid(newCoordinates, vectors, newGridArea, iteration + 1)
   }
 
   def applyVector(coordinates: Array[(Int, Int)], vectors: Array[(Int, Int)]): Array[(Int, Int)] = {
